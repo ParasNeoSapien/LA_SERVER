@@ -4,9 +4,21 @@ const jwt = require('jsonwebtoken')
 const http2 = require('http2')
 const fs = require('fs')
 const path = require('path')
+const { MongoClient } = require('mongodb')
 
 const app = express()
 const PORT = process.env.PORT || 8899
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017'
+const MONGO_DB  = process.env.MONGO_DB  || 'live_activities'
+
+let _mongoClient = null
+async function getDb() {
+  if (!_mongoClient) {
+    _mongoClient = new MongoClient(MONGO_URI)
+    await _mongoClient.connect()
+  }
+  return _mongoClient.db(MONGO_DB)
+}
 
 const DEFAULT_KEY_PATH = path.join(__dirname, '..', 'keys', 'AuthKey.p8')
 const BUNDLE_IDS = {
@@ -65,6 +77,20 @@ function sendApns(environment, token, payload, keyId, teamId, authKey) {
     req.end()
   })
 }
+
+app.get('/api/live-activity-token/:activityKey', async (req, res) => {
+  try {
+    const db = await getDb()
+    const doc = await db.collection('live_activities').findOne(
+      { activity_key: req.params.activityKey },
+      { projection: { push_token: 1 } }
+    )
+    if (!doc) return res.json({ found: false, push_token: null })
+    res.json({ found: true, push_token: doc.push_token ?? null })
+  } catch (e) {
+    res.status(500).json({ found: false, push_token: null, error: e.message })
+  }
+})
 
 app.post('/api/send', async (req, res) => {
   const { environment, token, payload, key_id, team_id, auth_key } = req.body
