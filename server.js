@@ -82,7 +82,7 @@ app.get('/api/live-activity-token/:activityKey', async (req, res) => {
   try {
     const db = await getDb()
     const doc = await db.collection('live_activities').findOne(
-      { activity_key: req.params.activityKey },
+      { calendar_event_id: req.params.activityKey },
       { projection: { push_token: 1 } }
     )
     if (!doc) return res.json({ found: false, push_token: null })
