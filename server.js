@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 8899
 const DEFAULT_KEY_PATH = path.join(__dirname, '..', 'keys', 'AuthKey.p8')
 const BUNDLE_IDS = {
   development: 'xyz.neosapien.neo2.dev',
-  production:  'xyz.neosapien.neo1',
+  production:  'xyz.neosapien.neo2.dev',
 }
 
 app.use(cors())
