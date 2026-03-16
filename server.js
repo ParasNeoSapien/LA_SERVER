@@ -9,7 +9,7 @@ const { MongoClient } = require('mongodb')
 const app = express()
 const PORT = process.env.PORT || 8899
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017'
-const MONGO_DB  = process.env.MONGO_DB  || 'live_activities'
+const MONGO_DB  = process.env.MONGO_DB  || 'neosapien_dev'
 
 let _mongoClient = null
 async function getDb() {
